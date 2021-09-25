@@ -1,0 +1,30 @@
+/*.main-app {*/
+/*    max-width: 1024px;*/
+/*    min-width: 960px;*/
+/*    padding: 15px;*/
+/*    margin: auto;*/
+/*}*/
+
+
+.vh-50 {
+    max-height: 50vh;
+}
+
+.img-fluid-v {
+    max-height: 100%;
+    height: auto;
+}
+.d-grid {
+    display: grid !important;
+}
+
+.grid-cols-3 {
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+.exercise__row {
+    transition: all 300ms;
+}
+.exercise__row:hover {
+    background: #333;
+}
