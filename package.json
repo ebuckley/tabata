@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "repl": "shadow-cljs  app",
+    "repl": "shadow-cljs cljs-repl app",
     "generate-pom": "shadow-cljs pom app",
     "dev": "shadow-cljs watch app",
     "release": "shadow-cljs release app",

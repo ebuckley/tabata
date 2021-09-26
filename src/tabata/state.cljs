@@ -190,7 +190,24 @@
       {:editing      (not is-editing)
        :current-step nil})))
 
-;TODO make this happen next..
-(defn edit-add-exercise []
-  "switch to a state of editing or adding a new exercise"
-  )
+(defn upgrade-workout-step [id workout interval]
+  (println "upgrade workout step " id " workout:" workout " interval:" interval)
+  (swap!
+    current-workout
+    update-in [:steps id]
+    merge {:state workout :interval interval}))
+
+(defn drop-at-index
+  "takes a collection and returns a collection with the element at id dropped"
+  [id col]
+  (into [] (->> col
+       (map-indexed (fn [curid val] [curid val]))
+       (filter (fn [[curid val]]
+                 (not (= curid id))))
+       (map #(get % 1)))))
+
+(defn delete-workout-step [id]
+
+  (let [new (drop-at-index id (:steps @current-workout))]
+    (println "drop at id: " id " new \n" new)
+    (swap! current-workout assoc :steps new)))
