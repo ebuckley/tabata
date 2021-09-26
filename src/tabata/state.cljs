@@ -1,74 +1,62 @@
 (ns tabata.state
   (:require [reagent.core :as r]))
+
+(def twenty-minute-burn [{:interval 3 :state :countdown}
+                         {:interval 40 :state :squat}
+                         {:interval 20 :state :rest}
+                         {:interval 40 :state :burpees}
+                         {:interval 20 :state :rest}
+                         {:interval 40 :state :lunge}
+                         {:interval 20 :state :rest}
+                         {:interval 40 :state :push-up-rotate}
+                         {:interval 20 :state :rest}
+                         {:interval 40 :state :high-knees}
+                         ; one round
+                         {:interval 20 :state :rest}
+                         {:interval 40 :state :squat}
+                         {:interval 20 :state :rest}
+                         {:interval 40 :state :burpees}
+                         {:interval 20 :state :rest}
+                         {:interval 40 :state :lunge}
+                         {:interval 20 :state :rest}
+                         {:interval 40 :state :push-up-rotate}
+                         {:interval 20 :state :rest}
+                         {:interval 40 :state :high-knees}
+                         {:interval 20 :state :rest}
+                         {:interval 40 :state :squat}
+                         {:interval 20 :state :rest}
+                         {:interval 40 :state :burpees}
+                         {:interval 20 :state :rest}
+                         {:interval 40 :state :lunge}
+                         {:interval 20 :state :rest}
+                         {:interval 40 :state :push-up-rotate}
+                         {:interval 20 :state :rest}
+                         {:interval 40 :state :high-knees}
+                         {:interval 20 :state :rest}
+                         {:interval 40 :state :squat}
+                         {:interval 20 :state :rest}
+                         {:interval 40 :state :burpees}
+                         {:interval 20 :state :rest}
+                         {:interval 40 :state :lunge}
+                         {:interval 20 :state :rest}
+                         {:interval 40 :state :push-up-rotate}
+                         {:interval 20 :state :rest}
+                         {:interval 40 :state :high-knees}
+                         {:interval 20 :state :rest}
+                         {:interval 40 :state :lunge}])
+
+(def core-rotation [{:interval 40 :state :squat}
+                    {:interval 20 :state :rest}
+                    {:interval 40 :state :burpees}
+                    {:interval 20 :state :rest}
+                    {:interval 40 :state :lunge}
+                    {:interval 20 :state :rest}
+                    {:interval 40 :state :push-up-rotate}])
+
 (def current-workout (r/atom {
                               :current-step nil
                               :editing      false
-                              :steps
-                                            [{:interval 3 :state :countdown}
-                                             {:interval 40 :state :squat}
-                                             {:interval 20 :state :rest}
-                                             {:interval 40 :state :burpees}
-                                             {:interval 20 :state :rest}
-                                             {:interval 40 :state :lunge}
-                                             {:interval 20 :state :rest}
-                                             {:interval 40 :state :push-up-rotate}
-                                             {:interval 20 :state :rest}
-                                             {:interval 40 :state :high-knees}
-                                             ; one round
-                                             {:interval 20 :state :rest}
-                                             {:interval 40 :state :squat}
-                                             {:interval 20 :state :rest}
-                                             {:interval 40 :state :burpees}
-                                             {:interval 20 :state :rest}
-                                             {:interval 40 :state :lunge}
-                                             {:interval 20 :state :rest}
-                                             {:interval 40 :state :push-up-rotate}
-                                             {:interval 20 :state :rest}
-                                             {:interval 40 :state :high-knees}
-                                             {:interval 20 :state :rest}
-                                             {:interval 40 :state :squat}
-                                             {:interval 20 :state :rest}
-                                             {:interval 40 :state :burpees}
-                                             {:interval 20 :state :rest}
-                                             {:interval 40 :state :lunge}
-                                             {:interval 20 :state :rest}
-                                             {:interval 40 :state :push-up-rotate}
-                                             {:interval 20 :state :rest}
-                                             {:interval 40 :state :high-knees}
-                                             {:interval 20 :state :rest}
-                                             {:interval 40 :state :squat}
-                                             {:interval 20 :state :rest}
-                                             {:interval 40 :state :burpees}
-                                             {:interval 20 :state :rest}
-                                             {:interval 40 :state :lunge}
-                                             {:interval 20 :state :rest}
-                                             {:interval 40 :state :push-up-rotate}
-                                             {:interval 20 :state :rest}
-                                             {:interval 40 :state :high-knees}
-                                             ]}))
-#_(def current-workout
-    (r/atom {:steps        [{:interval 3
-                             :state    :countdown}
-                            {:interval 40
-                             :state    :jumping-jacks}
-                            {:interval 20
-                             :state    :rest}
-                            {:interval 40
-                             :state    :mountain-climber}
-                            {:interval 20
-                             :state    :rest}
-                            {:interval 40
-                             :state    :push-up-rotate}
-                            {:interval 20
-                             :state    :rest}
-                            {:interval 40
-                             :state    :burpees}
-                            {:interval 20
-                             :state    :rest}
-                            {:interval 40
-                             :state    :squat}]
-             :current-step nil
-             :editing      false}))
+                              :steps        twenty-minute-burn}))
 
 
 (def counter (r/atom {:state   :stopped
@@ -170,15 +158,18 @@
 (defn start-action
   []
   (ticker)
+  (swap! current-workout
+         merge
+         {:editing false})
   (set-step 0))
 
 (defn restart-action
   []
-  (println "restart-acti4on")
   (case (workout-state @current-workout)
     :pre-start (start-action)
     :started (ticker)
-    :finished (start-action)))
+    :finished (start-action)
+    :editing (start-action)))
 
 (defn edit-action []
   (let [curr @current-workout
@@ -201,13 +192,19 @@
   "takes a collection and returns a collection with the element at id dropped"
   [id col]
   (into [] (->> col
-       (map-indexed (fn [curid val] [curid val]))
-       (filter (fn [[curid val]]
-                 (not (= curid id))))
-       (map #(get % 1)))))
+                (map-indexed (fn [curid val] [curid val]))
+                (filter (fn [[curid val]]
+                          (not (= curid id))))
+                (map #(get % 1)))))
 
 (defn delete-workout-step [id]
 
   (let [new (drop-at-index id (:steps @current-workout))]
     (println "drop at id: " id " new \n" new)
     (swap! current-workout assoc :steps new)))
+
+
+(defn add-workout-step []
+  (let [orig (:steps @current-workout)
+        new (into [] (concat orig [{:interval 0 :state :rest}]))]
+    (swap! current-workout assoc :steps new )))

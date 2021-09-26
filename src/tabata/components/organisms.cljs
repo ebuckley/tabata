@@ -19,7 +19,7 @@
      [molecules/show-progress]]))
 
 
-(defn pick-exercise [exer interval picked-fn deleted-fn]
+(defn pick-exercise [exer interval picked-fn deleted-fn cancel-fn]
   (let [has-exer (nil? (get state/exercises exer))
         choosing-exercise (r/atom false)
         interval-atom (r/atom interval)
@@ -45,9 +45,10 @@
            :on-change   #(reset! interval-atom (.-value (.-target %)))}]]
         [:div.col-auto [:span.form-text "seconds"]]
         [:div.col-auto
-         [:div.btn-group
+         [:div.btn-group.me-4
           [atoms/button [atoms/icon "save"] #(picked-fn @exer-atom @interval-atom)] ; SAVE the exercise
-          [atoms/button [atoms/icon "trash"] #(deleted-fn)]] ; DELETE the exercise
+          [atoms/button [atoms/icon "trash"] #(deleted-fn)]
+          [atoms/button [atoms/icon "x-lg"] #(cancel-fn)]] ; DELETE the exercise
          ]]
        (if @choosing-exercise
          [:div
@@ -79,24 +80,38 @@
              (reset! is-edit false))
           #(do
              (state/delete-workout-step id)
-             (reset! is-edit false))]]
+             (reset! is-edit false))
+          #(reset! is-edit false)]]
         [:div.row.exercise__row {:on-click #(reset! is-edit true)}
          [:div.col-3.d-flex.justify-content-center {:style {:height "125px"}} [molecules/get-exercise-image (:state cur)]]
          [:div.col-9.d-flex.align-items-center
           [molecules/get-step-title cur]]]))))
 
+
+(defn seconds-minutes
+  "a helper that turns a number of seconds into a minutes and seconds count"
+  [seconds]
+  (let [
+        remainder (mod seconds 60)
+        minutes (int (/ seconds 60))]
+    (str minutes "m " remainder "s ")))
+
 (defn edit-workout
   []
   (let [current-steps (:steps @state/current-workout)
-        idx-steps (map-indexed (fn [id val] [id val]) current-steps)]
+        idx-steps (map-indexed (fn [id val] [id val]) current-steps)
+        sum-seconds (->> current-steps
+                         (map :interval)
+                         (map int)
+                         (reduce +)
+                         (seconds-minutes))]
     [:div.pt-3
      [:h3 "Edit Workout"]
+     [:span.lead (str "Your rotation takes " sum-seconds)]
      (for [[idx cur] idx-steps]
        [:div {:key (str idx "-" (print-str cur))}
         [pick-or-view-row idx cur]])
-     #_(for [cur (state/just-current-exercises)]
-         [pick-or-view-row cur])
-     [atoms/button "Add Exercise" #(println "Just add one more exercise or something")]]))
+     [atoms/button "Add Exercise" #(state/add-workout-step)]]))
 
 (defn current-state
   []
@@ -110,7 +125,7 @@
   []
   "Component which displays the current workout"
   [:main.main-app.container-sm
-   [:div.btn-toolbar {:role "toolbar"}
+   [:div.btn-toolbar.py-3 {:role "toolbar"}
     [:div.btn-group.me-4
      [atoms/button [:span [atoms/icon "skip-backward-fill"]] #(state/set-step (dec (:current-step @state/current-workout)))]
      [atoms/button [:span [atoms/icon "play-fill"]] #(state/restart-action)]
@@ -120,6 +135,7 @@
      [atoms/button [atoms/icon "stop-fill"] #(state/start-action)]]
     [:div.btn-group.float-right
      [atoms/button [atoms/icon "pencil-square"] #(state/edit-action)]]]
-   [current-state]
-   [molecules/preview-current]
-   [pick-exercise :squat 40 #(println "picked" %) #(println "selected delete!")]])
+   [:div
+    [current-state]
+    [molecules/preview-current]]
+   ])

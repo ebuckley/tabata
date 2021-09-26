@@ -9,4 +9,15 @@ This project was inspired by the awesome content on the /r/hiit subreddit. I enj
 
 ## Roadmap
 
-- edit & share exercises
+- go direct to play from edit.
+- edit exercises
+  - add an exercise
+  - cancel editing an exercise
+- share an exercise
+  - Using a url, anyone can view the exercise?
+
+### maybe
+
+- log in
+- save my exercises
+- record my exercises
