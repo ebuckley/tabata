@@ -9,13 +9,16 @@
   []
   (let [curr @state/current-workout
         step (get (:steps curr) (:current-step curr))]
-    [:div
+    [:div.card.shadow-lg
      [atoms/static-bar (:total @state/counter) (:current @state/counter)]
-     [molecules/get-step-title step]
-     [:div.d-flex.justify-content-center.p-3 {:style {:height "25vh"}}
-      [molecules/get-exercise-image (:state step)]]
-     [molecules/count-downer]
-     [molecules/next-exercise]
+     [:div.p-3 {:style { :height "calc(100vh - 250px)"}}
+
+      [molecules/get-step-title step]
+      [:div.d-flex.justify-content-center.p-3 {:style {:max-height "calc(100vh - 500px)"}}
+       [molecules/get-exercise-image (:state step)]]
+      [molecules/count-downer]
+      [molecules/next-exercise]
+      ]
      [molecules/show-progress]]))
 
 

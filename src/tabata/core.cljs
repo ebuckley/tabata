@@ -4,7 +4,11 @@
 
 
 (defn app []
-  [organisms/mainscreen])
+  [:div
+   [organisms/mainscreen]
+   [:footer.pt-5.my-5.text-muted.border-top
+    [:span "Created by ersin"]
+    [:a.my-1 {:href "https://github.com/ebuckley/tabata"} "Code"]]])
 
 (defn ^:export main
   []
