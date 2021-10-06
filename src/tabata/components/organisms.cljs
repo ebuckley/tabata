@@ -2,7 +2,8 @@
   (:require [tabata.components.atoms :as atoms]
             [tabata.components.molecules :as molecules]
             [tabata.state :as state]
-            [reagent.core :as r]))
+            [reagent.core :as r]
+            [reitit.frontend.easy :as rfe]))
 
 
 (defn show-exercise
@@ -116,12 +117,20 @@
         [pick-or-view-row idx cur]])
      [atoms/button "Add Exercise" #(state/add-workout-step)]]))
 
+(defn pre-start []
+  [:h3 "Just click play to start a workout!"])
+
+(defn finished []
+  [:div
+   [:h3 "Nice work!"]
+   [:p "If you enjoyed this, or have any ideas for improvement, I would love to get your input!"]])
+
 (defn current-state
   []
   (case (state/workout-state @state/current-workout)
     :editing [edit-workout]
-    :pre-start [:h3 "Just click start to get going!"]
-    :finished [:h3 "Nice work!"]
+    :pre-start [pre-start]
+    :finished [finished]
     :started [show-exercise]))
 
 (defn mainscreen
@@ -142,3 +151,11 @@
     [current-state]
     [molecules/preview-current]]
    ])
+
+(defn about-page
+  []
+  [:main.main-app.container-sm
+   [:h1 "About"]
+   [:p "This project was created so that I could get in to the habit of high intensity interval training, I was inspired by all the great content on the /r/hiit subreddit, but didn't have an easy way to do the workouts that are shared there."]
+   [:div
+    [:a {:href "/"} "Get back to a workout"]]])
